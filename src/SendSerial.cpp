@@ -14,10 +14,21 @@
 
 static char msg[] = "time is running out\n";
 static int len;
+static int fd;
+static int wlen;
+static char *xstr = "Hello!\n";
+static int xlen = strlen(xstr);
 
 // Output information to standard error telling user it's time
 void prompt_info(int signo)
 {
+    /* simple output */
+    wlen = write(fd, xstr, xlen);
+    if (wlen != xlen)
+    {
+        printf("Error from write: %d, %d\n", wlen, errno);
+    }
+    tcdrain(fd); /* delay for output */
     write(STDERR_FILENO, msg, len);
 }
 
@@ -103,10 +114,6 @@ void set_mincount(int fd, int mcount)
 int main()
 {
     char *portname = TERMINAL;
-    int fd;
-    int wlen;
-    char *xstr = "Hello!\n";
-    int xlen = strlen(xstr);
 
     len = strlen(msg);
     init_sigaction();
